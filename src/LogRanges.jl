@@ -15,7 +15,8 @@ you specify the number of elements not the ratio.
 Unlike `logspace` in Python and Matlab, the `start` and `stop` arguments are
 always the first and last elements of the result, not powers applied to some base.
 
-See also [`range`](@ref) for linearly spaced points.
+See also [`Base.range`](https://docs.julialang.org/en/v1/base/math/#Base.range)
+for linearly spaced points.
 
 # Examples
 ```jldoctest
@@ -40,9 +41,6 @@ julia> logrange(-27, -3, length=7)  # allows negative numbers
 7-element LogRange{Float64, Base.TwicePrecision{Float64}}:
  -27.0, -18.7208, -12.9802, -9.0, -6.24025, -4.32675, -3.0
 ```
-
-!!! compat "Julia 1.10"
-    This function requires at least Julia 1.10.
 """
 logrange(start::Number, stop::Number, length::Integer) = LogRange(start, stop, Int(length))
 logrange(start::Number, stop::Number; length::Integer) = LogRange(start, stop, Int(length))
@@ -54,10 +52,10 @@ logrange(start::Number, stop::Number; length::Integer) = LogRange(start, stop, I
 A range whose elements are spaced logarithmically between `start` and `stop`,
 with spacing controlled by `len`. Returned by [`logrange`](@ref).
 
-Like [`LinRange`](@ref), the first and last elements will be exactly those
-provided, but intermediate values may have small floating-point errors.
-These are calculated using the logs of the endpoints, which are
-stored on construction, often in higher precision than `T`.
+Like [`Base.LinRange`](https://docs.julialang.org/en/v1/base/collections/#Base.LinRange),
+the first and last elements will be exactly those provided, but intermediate values may
+have small floating-point errors. These are calculated using the logs of the endpoints,
+which are stored on construction, often in higher precision than `T`.
 
 Negative values of `start` and `stop` are allowed, but both must have the
 same sign. For complex `T`, all points lie on the same branch of `log`
@@ -104,9 +102,6 @@ julia> LogRange(0, 4, 5)
 5-element LogRange{Float64, Base.TwicePrecision{Float64}}:
  NaN, NaN, NaN, NaN, 4.0
 ```
-
-!!! compat "Julia 1.10"
-    This type requires at least Julia 1.10.
 """
 struct LogRange{T<:Number,X} <: AbstractArray{T,1}
     start::T
@@ -183,21 +178,31 @@ function Base.getindex(r::LogRange{T}, i::Int) where {T}
     return T <: Real ? copysign(T(x), r.start) : T(x)
 end
 
-function Base.show(io::IO, r::LogRange{T}) where {T}
-    print(io, "LogRange{", T, "}(")
-    ioc = IOContext(io, :typeinfo => T)
-    show(ioc, first(r))
-    print(io, ", ")
-    show(ioc, last(r))
-    print(io, ", ")
-    show(io, length(r))
-    print(io, ')')
+
+
+############################
+####   TwicePrecision   ####
+############################
+
+_exp_allowing_twice64(x::Number) = exp(x)
+_exp_allowing_twice64(x::Base.TwicePrecision{Float64}) = Base.Math.exp_impl(x.hi, x.lo, Val(:ℯ))
+
+# No error on negative x, and for NaN/Inf this returns junk:
+function _log_twice64_unchecked(x::Float64)
+    xu = reinterpret(UInt64, x)
+    if xu < (UInt64(1)<<52) # x is subnormal
+        xu = reinterpret(UInt64, x * 0x1p52) # normalize x
+        xu &= ~Base.sign_mask(Float64)
+        xu -= UInt64(52) << 52 # mess with the exponent
+    end
+    Base.TwicePrecision(Base.Math._log_ext(xu)...)
 end
 
 
-#######
 
-
+############################
+#####       show       #####
+############################
 
 function print_range(io::IO, r::AbstractArray,
                      pre::AbstractString = " ",
@@ -243,11 +248,16 @@ function print_range(io::IO, r::AbstractArray,
     end
 end
 
-
-
-#######
-
-
+function Base.show(io::IO, r::LogRange{T}) where {T}
+    print(io, "LogRange{", T, "}(")
+    ioc = IOContext(io, :typeinfo => T)
+    show(ioc, first(r))
+    print(io, ", ")
+    show(ioc, last(r))
+    print(io, ", ")
+    show(io, length(r))
+    print(io, ')')
+end
 
 function Base.show(io::IO, ::MIME"text/plain", r::LogRange)  # display LogRange like LinRange
     isempty(r) && return show(io, r)
@@ -256,26 +266,5 @@ function Base.show(io::IO, ::MIME"text/plain", r::LogRange)  # display LogRange 
     print_range(io, r, " ", ", ", "", " \u2026 ")
 end
 
-
-
-######
-
-
-
-# These functions exist for use in LogRange:
-
-_exp_allowing_twice64(x::Number) = exp(x)
-_exp_allowing_twice64(x::Base.TwicePrecision{Float64}) = Base.Math.exp_impl(x.hi, x.lo, Val(:ℯ))
-
-# No error on negative x, and for NaN/Inf this returns junk:
-function _log_twice64_unchecked(x::Float64)
-    xu = reinterpret(UInt64, x)
-    if xu < (UInt64(1)<<52) # x is subnormal
-        xu = reinterpret(UInt64, x * 0x1p52) # normalize x
-        xu &= ~Base.sign_mask(Float64)
-        xu -= UInt64(52) << 52 # mess with the exponent
-    end
-    Base.TwicePrecision(Base.Math._log_ext(xu)...)
-end
 
 end
