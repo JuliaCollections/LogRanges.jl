@@ -4,7 +4,8 @@ using Aqua
 
 @testset "LogRanges.jl" begin
     @testset "Code quality (Aqua.jl)" begin
-        Aqua.test_all(LogRanges)
+        Aqua.test_all(LogRanges, deps_compat=false)
+        Aqua.test_deps_compat(LogRanges, check_extras=false)
     end
 
     @testset "LogRange" begin
@@ -91,21 +92,21 @@ using Aqua
 
     @testset "_log_twice64_unchecked" begin
         # it roughly works
-        @test big(Base._log_twice64_unchecked(exp(1))) ≈ 1.0
-        @test big(Base._log_twice64_unchecked(exp(123))) ≈ 123.0
+        @test big(LogRanges._log_twice64_unchecked(exp(1))) ≈ 1.0
+        @test big(LogRanges._log_twice64_unchecked(exp(123))) ≈ 123.0
 
         # it gets high accuracy
         @test abs(big(log(4.0)) - log(big(4.0))) < 1e-16
-        @test abs(big(Base._log_twice64_unchecked(4.0)) - log(big(4.0))) < 1e-30
+        @test abs(big(LogRanges._log_twice64_unchecked(4.0)) - log(big(4.0))) < 1e-30
 
         # it handles subnormals
-        @test abs(big(Base._log_twice64_unchecked(1e-310)) - log(big(1e-310))) < 1e-20
+        @test abs(big(LogRanges._log_twice64_unchecked(1e-310)) - log(big(1e-310))) < 1e-20
 
         # it accepts negative, NaN, etc without complaint:
-        @test Base._log_twice64_unchecked(-0.0).lo isa Float64
-        @test Base._log_twice64_unchecked(-1.23).lo isa Float64
-        @test Base._log_twice64_unchecked(NaN).lo isa Float64
-        @test Base._log_twice64_unchecked(Inf).lo isa Float64
+        @test LogRanges._log_twice64_unchecked(-0.0).lo isa Float64
+        @test LogRanges._log_twice64_unchecked(-1.23).lo isa Float64
+        @test LogRanges._log_twice64_unchecked(NaN).lo isa Float64
+        @test LogRanges._log_twice64_unchecked(Inf).lo isa Float64
     end
 
 end

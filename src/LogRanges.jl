@@ -151,11 +151,10 @@ function LogRange(start::Number, stop::Number, len::Integer)
     LogRange{T}(convert(T, start), convert(T, stop), convert(Int, len))
 end
 
-size(r::LogRange) = (r.len,)
-length(r::LogRange) = r.len
+Base.size(r::LogRange) = (r.len,)
 
-first(r::LogRange) = r.start
-last(r::LogRange) = r.stop
+Base.first(r::LogRange) = r.start
+Base.last(r::LogRange) = r.stop
 
 function _logrange_extra(a::Number, b::Number, len::Int)
     loga = log(1.0 * a)  # widen to at least Float64
@@ -170,7 +169,7 @@ function _logrange_extra(a::Float64, b::Float64, len::Int)
     (loga/(len-1), logb/(len-1))
 end
 
-function getindex(r::LogRange{T}, i::Int) where {T}
+function Base.getindex(r::LogRange{T}, i::Int) where {T}
     @inline
     @boundscheck checkbounds(r, i)
     i == 1 && return r.start
@@ -184,7 +183,7 @@ function getindex(r::LogRange{T}, i::Int) where {T}
     return T <: Real ? copysign(T(x), r.start) : T(x)
 end
 
-function show(io::IO, r::LogRange{T}) where {T}
+function Base.show(io::IO, r::LogRange{T}) where {T}
     print(io, "LogRange{", T, "}(")
     ioc = IOContext(io, :typeinfo => T)
     show(ioc, first(r))
@@ -224,22 +223,22 @@ function print_range(io::IO, r::AbstractArray,
     colsr = n <= maxpossiblecols ? (1:n) : [1:div(maxpossiblecols,2)+1; (n-div(maxpossiblecols,2)):n]
     rowmatrix = reshape(r[colsr], 1, length(colsr)) # treat the range as a one-row matrix for print_matrix_row
     nrow, idxlast = size(rowmatrix, 2), last(axes(rowmatrix, 2))
-    A = alignment(io, rowmatrix, 1:m, 1:length(rowmatrix), screenwidth, screenwidth, sepsize, nrow) # how much space range takes
+    A = Base.alignment(io, rowmatrix, 1:m, 1:length(rowmatrix), screenwidth, screenwidth, sepsize, nrow) # how much space range takes
     if n <= length(A) # cols fit screen, so print out all elements
         print(io, pre) # put in pre chars
-        print_matrix_row(io,rowmatrix,A,1,1:n,sep,idxlast) # the entire range
+        Base.print_matrix_row(io,rowmatrix,A,1,1:n,sep,idxlast) # the entire range
         print(io, post) # add the post characters
     else # cols don't fit so put horiz ellipsis in the middle
         # how many chars left after dividing width of screen in half
         # and accounting for the horiz ellipsis
         c = div(screenwidth-length(hdots)+1,2)+1 # chars remaining for each side of rowmatrix
-        alignR = reverse(alignment(io, rowmatrix, 1:m, length(rowmatrix):-1:1, c, c, sepsize, nrow)) # which cols of rowmatrix to put on the right
+        alignR = reverse(Base.alignment(io, rowmatrix, 1:m, length(rowmatrix):-1:1, c, c, sepsize, nrow)) # which cols of rowmatrix to put on the right
         c = screenwidth - sum(map(sum,alignR)) - (length(alignR)-1)*sepsize - length(hdots)
-        alignL = alignment(io, rowmatrix, 1:m, 1:length(rowmatrix), c, c, sepsize, nrow) # which cols of rowmatrix to put on the left
+        alignL = Base.alignment(io, rowmatrix, 1:m, 1:length(rowmatrix), c, c, sepsize, nrow) # which cols of rowmatrix to put on the left
         print(io, pre)   # put in pre chars
-        print_matrix_row(io, rowmatrix,alignL,1,1:length(alignL),sep,idxlast) # left part of range
+        Base.print_matrix_row(io, rowmatrix,alignL,1,1:length(alignL),sep,idxlast) # left part of range
         print(io, hdots) # horizontal ellipsis
-        print_matrix_row(io, rowmatrix,alignR,1,length(rowmatrix)-length(alignR)+1:length(rowmatrix),sep,idxlast) # right part of range
+        Base.print_matrix_row(io, rowmatrix,alignR,1,length(rowmatrix)-length(alignR)+1:length(rowmatrix),sep,idxlast) # right part of range
         print(io, post)  # post chars
     end
 end
@@ -250,7 +249,7 @@ end
 
 
 
-function show(io::IO, ::MIME"text/plain", r::LogRange)  # display LogRange like LinRange
+function Base.show(io::IO, ::MIME"text/plain", r::LogRange)  # display LogRange like LinRange
     isempty(r) && return show(io, r)
     summary(io, r)
     println(io, ":")
@@ -266,17 +265,17 @@ end
 # These functions exist for use in LogRange:
 
 _exp_allowing_twice64(x::Number) = exp(x)
-_exp_allowing_twice64(x::TwicePrecision{Float64}) = Math.exp_impl(x.hi, x.lo, Val(:ℯ))
+_exp_allowing_twice64(x::Base.TwicePrecision{Float64}) = Base.Math.exp_impl(x.hi, x.lo, Val(:ℯ))
 
 # No error on negative x, and for NaN/Inf this returns junk:
 function _log_twice64_unchecked(x::Float64)
     xu = reinterpret(UInt64, x)
     if xu < (UInt64(1)<<52) # x is subnormal
         xu = reinterpret(UInt64, x * 0x1p52) # normalize x
-        xu &= ~sign_mask(Float64)
+        xu &= ~Base.sign_mask(Float64)
         xu -= UInt64(52) << 52 # mess with the exponent
     end
-    TwicePrecision(Math._log_ext(xu)...)
+    Base.TwicePrecision(Base.Math._log_ext(xu)...)
 end
 
 end
