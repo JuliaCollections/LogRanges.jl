@@ -10,11 +10,6 @@ Construct a specialized array whose elements are spaced logarithmically
 between the given endpoints. That is, the ratio of successive elements is
 a constant, calculated from the length.
 
-This is similar to `geomspace` in Python. Unlike `PowerRange` in Mathematica,
-you specify the number of elements not the ratio.
-Unlike `logspace` in Python and Matlab, the `start` and `stop` arguments are
-always the first and last elements of the result, not powers applied to some base.
-
 See also [`Base.range`](https://docs.julialang.org/en/v1/base/math/#Base.range)
 for linearly spaced points.
 
