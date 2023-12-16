@@ -142,3 +142,8 @@ end
     @test LogRanges._log_twice64_unchecked(NaN).lo isa Float64
     @test LogRanges._log_twice64_unchecked(Inf).lo isa Float64
 end
+
+@testset "issues" begin
+    # 199b29778547dfa7ff4971500f57847c89076688
+    @test LogRange(1e-310, 1e-300, 11)[3] > 0
+end
