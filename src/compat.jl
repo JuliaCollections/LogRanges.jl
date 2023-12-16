@@ -66,24 +66,33 @@ function table_unpack(ind::Int32)
     return jU, jL
 end
 
-function expm1b_kernel(x::Float64)
+function expm1b_kernel(::Val{:ℯ}, x::Float64)
     return x * evalpoly(x, (0.9999999999999912, 0.4999999999999997,
                             0.1666666857598779, 0.04166666857598777))
 end
-@inline function exp_impl(x::Float64, xlo::Float64, ::Val{:ℯ})
+
+MAGIC_ROUND_CONST(::Type{Float64}) = 6.755399441055744e15
+MAX_EXP(n::Val{:ℯ}, ::Type{Float64}) = 709.7827128933841
+MIN_EXP(n::Val{:ℯ}, ::Type{Float64}) = -745.1332191019412
+SUBNORM_EXP(n::Val{:ℯ}, ::Type{Float64}) = 708.3964185322641
+LogBo256INV(::Val{:ℯ}, ::Type{Float64}) = 369.3299304675746
+LogBo256U(::Val{:ℯ}, ::Type{Float64}) = -0.002707606173999011
+LogBo256L(::Val{:ℯ}, ::Type{Float64}) = -6.327543041662719e-14
+
+@inline function exp_impl(x::Float64, xlo::Float64, base)
     T = Float64
-    N_float = muladd(x, 369.3299304675746, 6.755399441055744e15)
+    N_float = muladd(x, LogBo256INV(base, T), MAGIC_ROUND_CONST(T))
     N = reinterpret(UInt64, N_float) % Int32
-    N_float -=  6.755399441055744e15 #N_float now equals round(x*369.3299304675746)
-    r = muladd(N_float, -0.002707606173999011, x)
-    r = muladd(N_float, -6.327543041662719e-14, r)
+    N_float -=  MAGIC_ROUND_CONST(T) #N_float now equals round(x*LogBo256INV(base, T))
+    r = muladd(N_float, LogBo256U(base, T), x)
+    r = muladd(N_float, LogBo256L(base, T), r)
     k = N >> 8
     jU, jL = table_unpack(N)
-    very_small = muladd(jU, expm1b_kernel(r), jL)
+    very_small = muladd(jU, expm1b_kernel(base, r), jL)
     small_part =  muladd(jU,xlo,very_small) + jU
-    if !(abs(x) <= 708.3964185322641)
-        x >= 709.7827128933845 && return Inf
-        x <= -37.42994775023705 && return 0.0
+    if !(abs(x) <= SUBNORM_EXP(base, T))
+        x >= MAX_EXP(base, T) && return Inf
+        x <= MIN_EXP(base, T) && return 0.0
         if k <= -53
             # The UInt64 forces promotion. (Only matters for 32 bit systems.)
             twopk = (k + UInt64(53)) << 52
