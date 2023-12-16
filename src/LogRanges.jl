@@ -159,8 +159,7 @@ function _logrange_extra(a::Float64, b::Float64, len::Int)
     (loga/(len-1), logb/(len-1))
 end
 
-function Base.getindex(r::LogRange{T}, i::Int) where {T}
-    @inline
+@inline function Base.getindex(r::LogRange{T}, i::Int) where {T}
     @boundscheck checkbounds(r, i)
     i == 1 && return r.start
     i == r.len && return r.stop
