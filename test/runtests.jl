@@ -22,7 +22,7 @@ end
 
 @testset "endpoints" begin
     @test LogRange(0.1f0, 100, 33)[1] === 0.1f0
-    @test LogRange(0.789, 123_456, 135_790)[[begin, end]] == [0.789, 123_456]
+    @test LogRange(0.789, 123_456, 135_790)[[1, end]] == [0.789, 123_456]
     @test LogRange(nextfloat(0f0), floatmax(Float32), typemax(Int))[end] === floatmax(Float32)
     @test LogRange(nextfloat(Float16(0)), floatmax(Float16), 66_000)[end] === floatmax(Float16)
     @test first(LogRange(pi, 2pi, 3000)) === LogRange(pi, 2pi, 3000)[1] === Float64(pi)
@@ -30,6 +30,13 @@ end
     if Int == Int64
         @test LogRange(0.1, 1000, 2^54)[end] === 1000.0
         @test LogRange(-0.1, -1000, 2^55)[end] === -1000.0
+    end
+end
+
+if VERSION < v"1.4"
+    function only(x)
+        length(x) == 1 || error()
+        first(x)
     end
 end
 
@@ -95,7 +102,24 @@ end
 
 @testset "printing" begin
     @test repr(LogRange(1,2,3)) == "LogRange{Float64}(1.0, 2.0, 3)"
-    @test repr("text/plain", LogRange(1,2,3)) == "3-element LogRange{Float64, Base.TwicePrecision{Float64}}:\n 1.0, 1.41421, 2.0"
+    target = if VERSION < v"1.6"
+        """
+        3-element LogRange{Float64,Base.TwicePrecision{Float64}}:
+         1.0
+         1.4142135623730951
+         2.0"""
+    elseif VERSION < v"1.8"
+        """
+        3-element LogRange{Float64, Base.TwicePrecision{Float64}}:
+         1.0
+         1.4142135623730951
+         2.0"""
+    else
+        """
+        3-element LogRange{Float64, Base.TwicePrecision{Float64}}:
+         1.0, 1.41421, 2.0"""
+    end
+    @test repr("text/plain", LogRange(1,2,3)) == target
 end
 
 @testset "_log_twice64_unchecked" begin

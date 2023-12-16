@@ -18,7 +18,7 @@ julia> logrange(1, 1000, 7)
  1.0, 3.16228, 10.0, 31.6228, 100.0, 316.228, 1000.0
 ```
 
-That's it. This is a very lightweight dependancy.
+That's it. This is a very lightweight dependency.
 ```julia
 julia> @time_imports using LogRanges
       0.5 ms  LogRanges
