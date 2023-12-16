@@ -102,7 +102,9 @@ end
 
 @testset "printing" begin
     @test repr(LogRange(1,2,3)) == "LogRange{Float64}(1.0, 2.0, 3)"
-    target = if VERSION < v"1.6"
+    target = if VERSION < v"1.4"
+        "3-element LogRange{Float64,Base.TwicePrecision{Float64}}:\n 1.0               \n 1.4142135623730951\n 2.0               "
+    elseif VERSION < v"1.6"
         """
         3-element LogRange{Float64,Base.TwicePrecision{Float64}}:
          1.0
