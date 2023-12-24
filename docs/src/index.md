@@ -4,7 +4,7 @@ CurrentModule = LogRanges
 
 # LogRanges
 
-Documentation for [LogRanges](https://github.com/LilithHafner/LogRanges.jl).
+Documentation for [LogRanges](https://github.com/JuliaCollections/LogRanges.jl).
 
 ```@index
 ```
