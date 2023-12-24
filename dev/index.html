@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · LogRanges.jl</title><meta name="title" content="Home · LogRanges.jl"/><meta property="og:title" content="Home · LogRanges.jl"/><meta property="twitter:title" content="Home · LogRanges.jl"/><meta name="description" content="Documentation for LogRanges.jl."/><meta property="og:description" content="Documentation for LogRanges.jl."/><meta property="twitter:description" content="Documentation for LogRanges.jl."/><meta property="og:url" content="https://JuliaCollections.github.io/LogRanges.jl/"/><meta property="twitter:url" content="https://JuliaCollections.github.io/LogRanges.jl/"/><link rel="canonical" href="https://JuliaCollections.github.io/LogRanges.jl/"/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>LogRanges.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaCollections/LogRanges.jl/blob/main/docs/src/index.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="LogRanges"><a class="docs-heading-anchor" href="#LogRanges">LogRanges</a><a id="LogRanges-1"></a><a class="docs-heading-anchor-permalink" href="#LogRanges" title="Permalink"></a></h1><p>Documentation for <a href="https://github.com/JuliaCollections/LogRanges.jl">LogRanges</a>.</p><ul><li><a href="#LogRanges.LogRange"><code>LogRanges.LogRange</code></a></li><li><a href="#LogRanges.logrange-Tuple{Number, Number, Integer}"><code>LogRanges.logrange</code></a></li><li><a href="#LogRanges.splitbits-Tuple{Float64}"><code>LogRanges.splitbits</code></a></li></ul><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="LogRanges.LogRange" href="#LogRanges.LogRange"><code>LogRanges.LogRange</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">LogRange{T}(start, stop, len) &lt;: AbstractVector{T}</code></pre><p>A range whose elements are spaced logarithmically between <code>start</code> and <code>stop</code>, with spacing controlled by <code>len</code>. Returned by <a href="#LogRanges.logrange-Tuple{Number, Number, Integer}"><code>logrange</code></a>.</p><p>Like <a href="https://docs.julialang.org/en/v1/base/collections/#Base.LinRange"><code>Base.LinRange</code></a>, the first and last elements will be exactly those provided, but intermediate values may have small floating-point errors. These are calculated using the logs of the endpoints, which are stored on construction, often in higher precision than <code>T</code>.</p><p>Negative values of <code>start</code> and <code>stop</code> are allowed, but both must have the same sign. For complex <code>T</code>, all points lie on the same branch of <code>log</code> as used by <code>log(start)</code> and <code>log(stop)</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; LogRange(1, 4, 5)
+5-element LogRange{Float64, Base.TwicePrecision{Float64}}:
+ 1.0, 1.41421, 2.0, 2.82843, 4.0
+
+julia&gt; LogRange{Float16}(-1, -4, 5)
+5-element LogRange{Float16, Float64}:
+ -1.0, -1.414, -2.0, -2.828, -4.0
+
+julia&gt; LogRange(1e-310, 1e-300, 11)[1:2:end]
+6-element Vector{Float64}:
+ 1.0e-310
+ 9.999999999999974e-309
+ 9.999999999999981e-307
+ 9.999999999999988e-305
+ 9.999999999999994e-303
+ 1.0e-300
+
+julia&gt; prevfloat(1e-308, 5) == ans[2]
+true
+
+julia&gt; LogRange{ComplexF32}(1, -1 +0.0im, 5) |&gt; collect
+5-element Vector{ComplexF32}:
+         1.0f0 + 0.0f0im
+  0.70710677f0 + 0.70710677f0im
+  6.123234f-17 + 1.0f0im
+ -0.70710677f0 + 0.70710677f0im
+        -1.0f0 + 0.0f0im
+
+julia&gt; ans ≈ cis.(LinRange{Float32}(0, pi, 5))
+true
+
+julia&gt; LogRange(2, Inf, 5)
+5-element LogRange{Float64, Base.TwicePrecision{Float64}}:
+ 2.0, Inf, Inf, Inf, Inf
+
+julia&gt; LogRange(0, 4, 5)
+5-element LogRange{Float64, Base.TwicePrecision{Float64}}:
+ NaN, NaN, NaN, NaN, 4.0</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaCollections/LogRanges.jl/blob/25ad4ed815190bef5fc9fef95f7985190ae94127/src/LogRanges.jl#L44-L100">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="LogRanges.logrange-Tuple{Number, Number, Integer}" href="#LogRanges.logrange-Tuple{Number, Number, Integer}"><code>LogRanges.logrange</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">logrange(start, stop, length)
+logrange(start, stop; length)</code></pre><p>Construct a specialized array whose elements are spaced logarithmically between the given endpoints. That is, the ratio of successive elements is a constant, calculated from the length.</p><p>See also <a href="https://docs.julialang.org/en/v1/base/math/#Base.range"><code>Base.range</code></a> for linearly spaced points.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; logrange(10, 4000, length=3)
+3-element LogRange{Float64, Base.TwicePrecision{Float64}}:
+ 10.0, 200.0, 4000.0
+
+julia&gt; ans[2] ≈ sqrt(10 * 4000)  # middle element is the geometric mean
+true
+
+julia&gt; range(10, 40, length=3)[2] ≈ (10 + 40)/2  # arithmetic mean
+true
+
+julia&gt; logrange(1f0, 32f0, 11)
+11-element LogRange{Float32, Float64}:
+ 1.0, 1.41421, 2.0, 2.82843, 4.0, 5.65685, 8.0, 11.3137, 16.0, 22.6274, 32.0
+
+julia&gt; logrange(1, 1000, length=4) ≈ 10 .^ (0:3)
+true
+
+julia&gt; logrange(-27, -3, length=7)  # allows negative numbers
+7-element LogRange{Float64, Base.TwicePrecision{Float64}}:
+ -27.0, -18.7208, -12.9802, -9.0, -6.24025, -4.32675, -3.0</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaCollections/LogRanges.jl/blob/25ad4ed815190bef5fc9fef95f7985190ae94127/src/LogRanges.jl#L5-L39">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="LogRanges.splitbits-Tuple{Float64}" href="#LogRanges.splitbits-Tuple{Float64}"><code>LogRanges.splitbits</code></a> — <span class="docstring-category">Method</span></header><section><div><p>Splits a Float64 into a hi bit and a low bit where the high bit has 27 trailing 0s and the low bit has 26 trailing 0s</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaCollections/LogRanges.jl/blob/25ad4ed815190bef5fc9fef95f7985190ae94127/src/compat.jl#L272">source</a></section></article></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Sunday 24 December 2023 02:19">Sunday 24 December 2023</span>. Using Julia version 1.9.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
