@@ -1,5 +1,7 @@
 # LogRanges
 
+## This package is unmaintained. You may use `Base.logrange` starting in Julia 1.11 or [`Compat.logrange`](https://github.com/JuliaLang/Compat.jl) instead.
+
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaCollections.github.io/LogRanges.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaCollections.github.io/LogRanges.jl/dev/)
 [![Build Status](https://github.com/JuliaCollections/LogRanges.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JuliaCollections/LogRanges.jl/actions/workflows/CI.yml?query=branch%3Amain)
